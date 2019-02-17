@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect
+from flask_cors import CORS
 from twilio.rest import Client
 from passwords import *
 import jinja2
@@ -10,13 +11,21 @@ from os.path import join, dirname
 import json
 import requests
 
+from watson_developer_cloud import VisualRecognitionV3
+import time, operator
+import cv2
+
 from watson_developer_cloud import SpeechToTextV1
 
+
+
 app = Flask(__name__)
+CORS(app) 
+
 TEST_MODE = True
 number = ''
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def hello():
 	print('hi')
 	return 'oh'
@@ -25,6 +34,7 @@ def hello():
 def chance():
 	return redirect('/')
 
+@app.route('/send_sms')
 def send_sms():
 	# TODO: Makena's code
 	account_sid = TWILIO_ACCOUNT_SID
@@ -41,6 +51,52 @@ def send_sms():
                  )
 
 	# print(message.sid)
+
+def classify_image(img):
+	visual_recognition = VisualRecognitionV3(version='2018-03-19', iam_apikey='s5JSfY9-Eb14tzcA6xBkWoYmVpIF9eJFIHlutgUYBMcP')
+
+	with open(img, 'rb') as images_file:
+		#print(img)
+		classes = visual_recognition.classify(
+			images_file,
+			threshold='0.5',
+			owners=["IBM"]).get_result()
+		# j = json.dumps(classes, indent=2)
+		items = classes['images'][0]['classifiers'][0]['classes']
+		labels_scores_dict = {}
+
+		for i in items:
+			labels_scores_dict[i['class']] = i['score']
+
+		#print(labels_scores_dict)
+		print()
+
+		results = []
+		for k, v in labels_scores_dict.items():
+			if k == 'police cruiser':
+				results.append(k)
+				return json.dumps(results)
+
+		for key, value in sorted(labels_scores_dict.items(), key=operator.itemgetter(1), reverse=True)[-3:]:
+			if key != 'police cruiser':
+				results.append(key)
+
+		return json.dumps(results)
+
+@app.route('/record', methods=['GET'])
+def begin_classification():
+
+	camera = cv2.VideoCapture(0)
+
+	# for i in range(1):
+		#if i % 50 == 1:
+			#print(i)
+	return_value, image = camera.read()
+	cv2.imwrite('test_images/opencv.png', image)
+	results = classify_image('test_images/opencv.png')
+	del(camera)
+	return str(results)
+		
 
 def start_audio_recording():
 	# TODO: Start the audio recording
