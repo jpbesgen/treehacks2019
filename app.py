@@ -14,15 +14,17 @@ import requests
 from watson_developer_cloud import VisualRecognitionV3
 import time, operator
 import cv2
+import vlc
 
 from watson_developer_cloud import SpeechToTextV1
+from playsound import playsound
 
 
 
 app = Flask(__name__)
 CORS(app) 
 
-TEST_MODE = True
+TEST_MODE = False
 number = ''
 
 @app.route('/', methods=['GET'])
@@ -34,7 +36,24 @@ def hello():
 def chance():
 	return redirect('/')
 
-@app.route('/send_sms')
+@app.route('/sound_calm', methods=['POST'])
+def sound_calm():
+	p = vlc.MediaPlayer('./sounds/mom.mp3')
+	p.play()
+	# playsound('./sounds/mom.mp3')
+	#playsound('./sounds/siren.wav')
+	return ""
+
+# @app.route('/stop', methods=['POST'])
+# def stop_playing(p):
+# 	p.stop()
+
+@app.route('/sound_encounter', methods=['POST'])
+def sound_encounter():
+	playsound('encounter.wav')
+	return ""
+
+@app.route('/send_sms', methods=['POST'])
 def send_sms():
 	# TODO: Makena's code
 	account_sid = TWILIO_ACCOUNT_SID
@@ -49,7 +68,7 @@ def send_sms():
                      from_='+18059792058',
                      to='+12016610120'
                  )
-
+	return True
 	# print(message.sid)
 
 def classify_image(img):
@@ -155,7 +174,7 @@ def speech_to_text(speech_file):
         interim_results=True,
         content_type='audio/wav',
         recognize_callback=myRecognizeCallback,
-        keywords=['ticket'],
+        keywords=['ticket', 'speeding', 'limit', 'cell phone', 'cellphone', 'seatbelt', 'tailgating'],
         keywords_threshold=0.8)
 
 #text_to_speech('hello my name is donald and i am a president')
