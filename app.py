@@ -16,6 +16,9 @@ import time, operator
 import cv2
 import vlc
 
+import threading
+
+
 from watson_developer_cloud import SpeechToTextV1
 from playsound import playsound
 
@@ -26,6 +29,7 @@ CORS(app)
 
 TEST_MODE = False
 number = ''
+
 
 @app.route('/', methods=['GET'])
 def hello():
@@ -38,10 +42,10 @@ def chance():
 
 @app.route('/sound_calm', methods=['POST'])
 def sound_calm():
-	p = vlc.MediaPlayer('./sounds/mom.mp3')
-	p.play()
-	# playsound('./sounds/mom.mp3')
-	#playsound('./sounds/siren.wav')
+	# p = vlc.MediaPlayer('./sounds/mom.mp3')
+	# p.play()
+	playsound('./sounds/siren_1.mp3')
+
 	return ""
 
 # @app.route('/stop', methods=['POST'])
@@ -50,7 +54,14 @@ def sound_calm():
 
 @app.route('/sound_encounter', methods=['POST'])
 def sound_encounter():
-	playsound('encounter.wav')
+	# playsound('encounter.wav')
+	# speech_to_text('encounter.wav')
+	thread1.start()
+	thread2.start()
+
+
+	thread1.join(15)
+	thread2.join(15)
 	return ""
 
 @app.route('/send_sms', methods=['POST'])
@@ -72,7 +83,7 @@ def send_sms():
 	# print(message.sid)
 
 def classify_image(img):
-	visual_recognition = VisualRecognitionV3(version='2018-03-19', iam_apikey='s5JSfY9-Eb14tzcA6xBkWoYmVpIF9eJFIHlutgUYBMcP')
+	visual_recognition = VisualRecognitionV3(version='2018-03-19', iam_apikey='DgV4PyKhKM8hEkRU0f3qAf2w-J9bTkCL9hjGAt4i7LbF')
 
 	with open(img, 'rb') as images_file:
 		#print(img)
@@ -143,7 +154,7 @@ def text_to_speech(text):
 			voice="en-US_MichaelVoice").get_result()
 		audio_file.write(response.content)
 
-def speech_to_text(speech_file):
+def stt(speech_file):
 	sst_api_key = 'e_jevakkc6QsQcCmA41mMtKE2sJl1Ug0OEoKEi8oLIb1'
 	sst_url = 'https://stream.watsonplatform.net/speech-to-text/api'
 	
@@ -190,6 +201,11 @@ def post():
 	if request.method == 'POST':
 		return render_template('post.html')
 	return render_template('get.html')
+
+
+thread1 = threading.Thread(target=stt, args=('./sounds/encounter.wav',))
+thread2 = threading.Thread(target=playsound, args=('./sounds/encounter.wav',))
+
 
 if __name__ == '__main__':
 	#port = int(os.environ.get('PORT', 8000))

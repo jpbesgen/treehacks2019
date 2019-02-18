@@ -32,6 +32,19 @@ export const Logo = styled.img`
   padding-top: 20px;
 `;
 
+export const LogoFull = styled.img`
+  height: 120px;
+  top: 20px;
+  padding-top: 20px;
+`;
+
+export const Followup = styled.img`
+  height: 500px;
+  top: 200px;
+  padding-top: 20px;
+  left: 100;
+`;
+
 export const List = styled.ul`
   text-align: center;
   font-family: 'Open Sans';

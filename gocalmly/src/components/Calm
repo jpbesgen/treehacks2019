@@ -1,0 +1,38 @@
+import React, { Component } from 'react'
+import '../App.css'
+import axios from 'axios'
+import * as S from "../styles/styles";
+import logo from "../icons/go_calmly_logo.png";
+
+
+class Calm extends Component {
+  constructor () {
+    super ()
+    this.state = {
+      classifications: []
+    }
+    this.playSound = this.playSound.bind(this)
+  }
+
+  playSound() {
+    axios.post('http://localhost:5000/sound_calm')
+  }
+
+  render () {
+    return (
+      <S.Background>
+        <S.Logo src={logo} />
+        {this.playSound()}
+        <S.List>
+          {this.state.classifications.map(function(listValue){
+            return <li>{listValue}</li>;
+          })}
+        </S.List>
+
+      </S.Background>
+
+        
+    )
+  }
+}
+export default Calm;

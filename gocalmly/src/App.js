@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Router, Link } from "@reach/router"
 import Home from "./components/Home";
 import Encounter from "./components/Encounter";
-import Calm from "./components/Calm";
+import Mom from "./components/Mom";
+import Followup from "./components/Followup"
 
 import * as S from "./styles/styles";
 import './App.css';
@@ -15,7 +16,8 @@ class App extends Component {
         <Router>
           <Home path="/"/>
           <Encounter path="/encounter"/>
-          <Calm path="/calm"/>
+          <Mom path="/mom"/>
+          <Followup path="/followup"/>
         </Router>
       </S.Background>
     );
